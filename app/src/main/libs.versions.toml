@@ -1,0 +1,12 @@
+toml
+[versions]
+retrofit = "2.9.0"
+coil = "2.4.0"
+
+[libraries]
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+
+[bundles]
+retrofit = ["retrofit", "retrofit-converter-gson"]
