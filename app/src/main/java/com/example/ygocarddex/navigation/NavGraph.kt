@@ -38,9 +38,6 @@ fun NavGraph(viewModel: YugiohViewModel = viewModel()) {
                         onCardClick = { selectedCard ->
                             navController.navigate(Screen.CardDetail.createRoute(selectedCard.id.toString()))
                         },
-                        onMenuClick = {
-                            println("Menu clicked!")
-                        },
                         onSearchClick = {
                             navController.navigate(Screen.SearchScreen.route)
                         }

@@ -12,13 +12,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.ImeAction
@@ -30,44 +35,60 @@ import com.example.ygocarddex.components.YugiohCard
 import com.example.ygocarddex.data.models.Card
 import com.example.ygocarddex.data.models.CardImage
 import com.example.ygocarddex.data.models.CardPrice
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardListScreen(
-    navController: NavController,  // Add this parameter for NavController
+    navController: NavController,  // Navigation Controller
     cards: List<Card>,
     onCardClick: (Card) -> Unit,
-    onMenuClick: () -> Unit,
-    onSearchClick: () -> Unit  // Add this parameter to handle search click
+    onSearchClick: () -> Unit
 ) {
-    var searchQuery by remember { mutableStateOf("") }
-    var isSearchVisible by remember { mutableStateOf(false) }
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed) // State to manage drawer
+    val scope = rememberCoroutineScope()
 
-    // Filter cards based on search query
-    val filteredCards = cards.filter { card ->
-        card.name.contains(searchQuery, ignoreCase = true)
-    }
+    ModalNavigationDrawer(
+        drawerContent = { SidebarContent() }, // Separate composable for drawer content
+        drawerState = drawerState
+    ) {
+        var searchQuery by remember { mutableStateOf("") }
+        var isSearchVisible by remember { mutableStateOf(false) }
 
-    Column(modifier = Modifier.fillMaxSize().padding(0.dp)) {
-        // Top App Bar with Menu icon and Search functionality
-        TopAppBarComponent(
-            title = "Yu-Gi-Oh! Card List",
-            onMenuClick = onMenuClick,  // Menu icon action
-            onSearchClick = onSearchClick  // Pass search click handler
-        )
-
-        // Show the search bar when isSearchVisible is true
-        if (isSearchVisible) {
-            SearchBar(searchQuery = searchQuery, onSearchQueryChange = { searchQuery = it })
+        // Filter cards based on search query
+        val filteredCards = cards.filter { card ->
+            card.name.contains(searchQuery, ignoreCase = true)
         }
 
-        // List of filtered cards
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(filteredCards) { card ->
-                YugiohCard(card = card, onCardClick = onCardClick)
+        Column(modifier = Modifier.fillMaxSize().padding(0.dp)) {
+            // Top App Bar with Menu icon and Search functionality
+            TopAppBarComponent(
+                title = "Yu-Gi-Oh! Card List",
+                onMenuClick = {
+                    // Open or close the drawer when menu is clicked
+                    scope.launch {
+                        if (drawerState.isClosed) drawerState.open()
+                        else drawerState.close()
+                    }
+                },
+                onSearchClick = onSearchClick  // Pass search click handler
+            )
+
+            // Show the search bar when isSearchVisible is true
+            if (isSearchVisible) {
+                SearchBar(searchQuery = searchQuery, onSearchQueryChange = { searchQuery = it })
+            }
+
+            // List of filtered cards
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(filteredCards) { card ->
+                    YugiohCard(card = card, onCardClick = onCardClick)
+                }
             }
         }
     }
 }
+
 
 @Composable
 fun SearchBar(
@@ -105,22 +126,40 @@ fun SearchBar(
     }
 }
 
+//
+//@Preview
+//@Composable
+//fun CardListScreenPreview() {
+//    // Provide a mock NavController to avoid passing null
+//    val navController = rememberNavController()
+//
+//    // DrawerState for handling sidebar functionality
+//    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+//    val scope = rememberCoroutineScope()
+//
+//    // Wrap with ModalNavigationDrawer for previewing the sidebar
+//    ModalNavigationDrawer(
+//        drawerContent = { SidebarContent() },
+//        drawerState = drawerState
+//    ) {
+//        // Preview with sample data
+//        CardListScreen(
+//            navController = navController,
+//            cards = sampleCardList,
+//            onCardClick = { /* No action for preview */ },
+//            onMenuClick = {
+//                // Simulate opening/closing the drawer
+//                scope.launch {
+//                    if (drawerState.isClosed) drawerState.open()
+//                    else drawerState.close()
+//                }
+//            },
+//            onSearchClick = { /* No action for preview */ }
+//        )
+//    }
+//}
 
-@Preview
-@Composable
-fun CardListScreenPreview() {
-    // Provide a mock NavController to avoid passing null
-    val navController = rememberNavController()
 
-    // Preview with sample data
-    CardListScreen(
-        navController = navController,
-        cards = sampleCardList,
-        onCardClick = {},
-        onMenuClick = {},
-        onSearchClick = { /* No action for preview */ }
-    )
-}
 // Sample data for preview
 val sampleCardList = listOf(
     Card(

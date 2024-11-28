@@ -1,35 +1,40 @@
 package com.example.ygocarddex.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import coil.compose.rememberAsyncImagePainter
 import com.example.ygocarddex.data.models.Card
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.IconButton
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.unit.Dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardDetailScreen(card: Card, onBackClick: () -> Unit) {
-    // Remember scroll state
     val scrollState = rememberScrollState()
+    var currentImageIndex by remember { mutableIntStateOf(0) } // Track swiped image index
+    var isExpanded by remember { mutableStateOf(false) }       // Track fullscreen state
 
     Column(
         modifier = Modifier
@@ -37,24 +42,24 @@ fun CardDetailScreen(card: Card, onBackClick: () -> Unit) {
             .verticalScroll(scrollState)
     ) {
         // Top Bar
-        CardDetailTopBar(
-            title = card.name,
-            onBackClick = onBackClick
-        )
+        CardDetailTopBar(title = card.name, onBackClick = onBackClick)
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Cropped Card Image
-        CroppedCardImage(
-            imageUrl = card.card_images.first().image_url,
-            topPadding = 20.dp,
-            bottomPadding = 50.dp
+        // Expandable and Swipeable Image Section
+        SwipeableExpandableImage(
+            imageUrls = card.card_images.map { it.image_url },
+            currentImageIndex = currentImageIndex,
+            onImageChange = { currentImageIndex = it },
+            isExpanded = isExpanded,
+            onExpandToggle = { isExpanded = !isExpanded },
+            scrollState = scrollState
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Card Details Section
-        CardDetailsSection(card)
+        CardDetailsSection(card = card)
     }
 }
 
@@ -86,28 +91,72 @@ fun CardDetailTopBar(title: String, onBackClick: () -> Unit) {
 }
 
 @Composable
-fun CroppedCardImage(imageUrl: String, topPadding: Dp, bottomPadding: Dp) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
+fun SwipeableExpandableImage(
+    imageUrls: List<String>,
+    currentImageIndex: Int,
+    onImageChange: (Int) -> Unit,
+    isExpanded: Boolean,
+    onExpandToggle: () -> Unit,
+    scrollState: androidx.compose.foundation.ScrollState
+) {
+    val maxIndex = imageUrls.size - 1
+    val scale = 1f - (scrollState.value / 1000f).coerceIn(0f, 0.3f) // Add a subtle scale effect
+
+    Box(
         modifier = Modifier
             .fillMaxWidth()
+            .height(300.dp)
             .padding(16.dp)
-            .shadow(8.dp, RoundedCornerShape(16.dp)),
-        elevation = CardDefaults.cardElevation(8.dp)
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures { change, dragAmount ->
+                    change.consume() // Consume touch events
+                    if (dragAmount > 50 && currentImageIndex > 0) {
+                        onImageChange(currentImageIndex - 1) // Swipe left
+                    } else if (dragAmount < -50 && currentImageIndex < maxIndex) {
+                        onImageChange(currentImageIndex + 1) // Swipe right
+                    }
+                }
+            }
+            .graphicsLayer(scaleX = scale, scaleY = scale) // Apply scale effect
+            .clip(RoundedCornerShape(16.dp))
+            .shadow(12.dp, RoundedCornerShape(16.dp))
     ) {
-        Box(
+        // Display Current Image
+        Image(
+            painter = rememberAsyncImagePainter(model = imageUrls[currentImageIndex]),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
-                .fillMaxWidth()
-                .height(300.dp) // Total height
-                .padding(top = topPadding, bottom = bottomPadding) // Crop by adjusting paddings
-                .clip(RoundedCornerShape(16.dp)) // Clip image to card shape
-        ) {
-            Image(
-                painter = rememberAsyncImagePainter(model = imageUrl),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
+                .fillMaxSize()
+                .clickable { onExpandToggle() } // Toggle fullscreen dialog
+        )
+
+        // Fullscreen Dialog
+        if (isExpanded) {
+            Dialog(onDismissRequest = { onExpandToggle() }) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black)
+                ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(model = imageUrls[currentImageIndex]),
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                    IconButton(
+                        onClick = { onExpandToggle() },
+                        modifier = Modifier.align(Alignment.TopEnd)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close Fullscreen",
+                            tint = Color.White
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -115,7 +164,6 @@ fun CroppedCardImage(imageUrl: String, topPadding: Dp, bottomPadding: Dp) {
 @Composable
 fun CardDetailsSection(card: Card) {
     Column(modifier = Modifier.padding(16.dp)) {
-        // Display Card Name and Type
         Text(
             text = "Name: ${card.name}",
             style = MaterialTheme.typography.headlineSmall,
@@ -138,7 +186,6 @@ fun CardDetailsSection(card: Card) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Display Card Description
         Text(
             text = card.desc,
             style = MaterialTheme.typography.bodyMedium,
@@ -147,7 +194,6 @@ fun CardDetailsSection(card: Card) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Display Card Prices
         if (card.card_prices.isNotEmpty()) {
             Text(
                 text = "Prices:",
@@ -168,7 +214,6 @@ fun CardDetailsSection(card: Card) {
         }
     }
 }
-
 
 @Composable
 fun PriceRow(label: String, price: String) {
