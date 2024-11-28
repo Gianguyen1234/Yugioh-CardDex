@@ -10,8 +10,6 @@ YGO Card Dex is an Android application built with Jetpack Compose that fetches a
   - **Card Name**
   - **Card Type**
   - **Card Description**
-  - **Card Race**
-  - **Archetype** (if available)
   - **Card Images**
   - **Card Prices**
 - **Search Functionality**: Allows users to search for cards by name or type.
@@ -104,18 +102,13 @@ Before running the application, ensure that you have the following installed:
 ### Installation
 1. Clone the repository:
    ```
-   git clone https://github.com/Gianguyen1234/YGO-Card-Dex.git
+   git clone https://github.com/Gianguyen1234/Yugioh-CardDex.git
    ```
 2. Open the project in Android Studio.
 3. Build and run the project on an emulator or physical device.
 
 ### Configuration
 The app is configured to fetch card data from the [YGOPRODeck API](https://db.ygoprodeck.com/api/v7/cardinfo.php). Make sure to review the API integration and any authentication required (if applicable).
-
-## Future Enhancements
-- **Filter Cards**: Implement filtering options to sort cards by type, price, or archetype.
-- **User Authentication**: Allow users to save their favorite cards or track owned cards.
-- **Offline Support**: Cache card data for offline viewing.
 
 ## Contributing
 Feel free to fork the repository and contribute to the project by submitting issues or pull requests.
