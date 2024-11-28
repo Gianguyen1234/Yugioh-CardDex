@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">YGO CardDex</string>
+    <string name="app_logo_description">App Logo</string>
+
 </resources>
