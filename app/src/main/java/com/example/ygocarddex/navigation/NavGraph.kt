@@ -13,9 +13,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import com.example.ygocarddex.screens.AboutScreen
 import com.example.ygocarddex.screens.CardDetailScreen
 import com.example.ygocarddex.screens.CardListScreen
+import com.example.ygocarddex.screens.FavoritesScreen
 import com.example.ygocarddex.screens.SearchScreen
+import com.example.ygocarddex.screens.SettingsScreen
 import com.example.ygocarddex.viewmodel.UiState
 import com.example.ygocarddex.viewmodel.YugiohViewModel
 
@@ -23,6 +26,7 @@ import com.example.ygocarddex.viewmodel.YugiohViewModel
 fun NavGraph(viewModel: YugiohViewModel = viewModel()) {
     val navController = rememberNavController()
     val uiState by viewModel.uiState.collectAsState()
+
 
     NavHost(navController = navController, startDestination = Screen.CardList.route) {
         composable(Screen.CardList.route) {
@@ -96,6 +100,17 @@ fun NavGraph(viewModel: YugiohViewModel = viewModel()) {
                 )
             }
         }
+
+        composable(Screen.About.route) {
+            AboutScreen(navController = navController) // Pass navController if needed
+        }
+        composable(Screen.Favorites.route) { // New Favorites route
+            FavoritesScreen(navController = navController)
+        }
+        composable(Screen.Settings.route) { // New Settings route
+            SettingsScreen(navController = navController)
+        }
+
     }
 }
 

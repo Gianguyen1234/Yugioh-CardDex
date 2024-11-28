@@ -6,4 +6,8 @@ sealed class Screen(val route: String) {
         fun createRoute(cardId: String) = "cardDetail/$cardId"
     }
     object SearchScreen : Screen("searchScreen")
+    object Favorites : Screen("favorites") // New Favorites route
+    object Settings : Screen("settings")   // New Settings route
+    object About : Screen("about")         // Already defined About route
 }
+

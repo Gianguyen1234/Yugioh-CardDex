@@ -20,9 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.ygocarddex.navigation.Screen
 
 @Composable
-fun SidebarContent() {
+fun SidebarContent(navController: NavController) {
     var selectedOption by remember { mutableStateOf("Home") } // State to track selected option
 
     Column(
@@ -35,28 +37,41 @@ fun SidebarContent() {
             icon = Icons.Default.Home,
             label = "Home",
             isSelected = selectedOption == "Home",
-            onClick = { selectedOption = "Home" }
+            onClick = {
+                selectedOption = "Home"
+                navController.navigate(Screen.CardList.route) // Navigate to the Home screen
+            }
         )
         SidebarOption(
             icon = Icons.Default.Favorite,
             label = "Favorites",
             isSelected = selectedOption == "Favorites",
-            onClick = { selectedOption = "Favorites" }
+            onClick = {
+                selectedOption = "Favorites"
+                navController.navigate(Screen.Favorites.route) // Navigate to Favorites screen
+            }
         )
         SidebarOption(
             icon = Icons.Default.Settings,
             label = "Settings",
             isSelected = selectedOption == "Settings",
-            onClick = { selectedOption = "Settings" }
+            onClick = {
+                selectedOption = "Settings"
+                navController.navigate(Screen.Settings.route) // Navigate to Settings screen
+            }
         )
         SidebarOption(
             icon = Icons.Default.Info,
             label = "About",
             isSelected = selectedOption == "About",
-            onClick = { selectedOption = "About" }
+            onClick = {
+                selectedOption = "About"
+                navController.navigate(Screen.About.route) // Navigate to the About screen
+            }
         )
     }
 }
+
 
 @Composable
 fun SidebarOption(

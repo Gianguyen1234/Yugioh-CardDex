@@ -49,7 +49,7 @@ fun CardListScreen(
     val scope = rememberCoroutineScope()
 
     ModalNavigationDrawer(
-        drawerContent = { SidebarContent() }, // Separate composable for drawer content
+        drawerContent = { SidebarContent( navController= navController) }, // Separate composable for drawer content
         drawerState = drawerState
     ) {
         var searchQuery by remember { mutableStateOf("") }

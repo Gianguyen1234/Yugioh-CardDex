@@ -1,7 +1,5 @@
 package com.example.ygocarddex.data.models
 
-
-
 data class CardResponse(val data: List<Card>)
 data class Card(
     val id: Int,
