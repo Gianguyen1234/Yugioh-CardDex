@@ -99,7 +99,6 @@ fun YugiohCard(
     }
 }
 
-
 @Composable
 fun TypeRaceArchetypeSection(card: Card) {
     Column(
@@ -115,12 +114,32 @@ fun TypeRaceArchetypeSection(card: Card) {
                 "Monster Card" -> MaterialTheme.colorScheme.errorContainer
                 "Spell Card" -> MaterialTheme.colorScheme.tertiaryContainer
                 "Trap Card" -> MaterialTheme.colorScheme.secondaryContainer
+                "Flip Effect Monster" -> Color(0xFFFFD700) // Golden yellow for Flip Effect Monsters
+                "Union Effect Monster" -> Color(0xFF6A5ACD) // Slate blue for Union Effect Monsters
+                "Link Monster" -> Color(0xFF6495ED) // Cornflower blue for Link Monsters
+                "Effect Monster" -> Color(0xFF8FBC8F) // Dark sea green for Effect Monsters
+                "Fusion Monster" -> Color(0xFFEE82EE) // Violet for Fusion Monsters
+                "Pendulum Effect Monster" -> Color(0xFFFF6347) // Tomato red for Pendulum Effect Monsters
+                "XYZ Monster" -> Color(0xFF4682B4) // Steel blue for XYZ Monsters
+                "Synchro Monster" -> Color(0xFFF0A7ED) // Light Steel Blue for Synchro Monsters
+                "Synchro Tuner Monster" -> Color(0xFFDA70D6) // Orchid color for Synchro Tuner Monsters
+                "Tuner Monster" -> Color(0xFF125205)
                 else -> MaterialTheme.colorScheme.surfaceVariant
             },
             textColor = when (card.type) {
                 "Monster Card" -> MaterialTheme.colorScheme.onErrorContainer
                 "Spell Card" -> MaterialTheme.colorScheme.onTertiaryContainer
                 "Trap Card" -> MaterialTheme.colorScheme.onSecondaryContainer
+                "Flip Effect Monster" -> Color(0xFF000000) // Black text for contrast on golden yellow
+                "Union Effect Monster" -> Color(0xFFFFFFFF) // White text for contrast on slate blue
+                "Link Monster" -> Color(0xFFFFFFFF) // White text for contrast on cornflower blue
+                "Effect Monster" -> Color(0xFF000000) // Black text for contrast on dark sea green
+                "Fusion Monster" -> Color(0xFF000000) // Black text for contrast on violet
+                "Pendulum Effect Monster" -> Color(0xFFFFFFFF) // White text for contrast on tomato red
+                "XYZ Monster" -> Color(0xFFFFFFFF) // White text for contrast on steel blue
+                "Synchro Monster" -> Color(0xFF000000) // Black text for contrast on light steel blue
+                "Synchro Tuner Monster" -> Color(0xFFFFFFFF) // White text for contrast on orchid color
+                "Tuner Monster" -> Color(0xFFFFFFFF)
                 else -> MaterialTheme.colorScheme.onSurfaceVariant
             }
         )
@@ -139,7 +158,7 @@ fun TypeRaceArchetypeSection(card: Card) {
                 label = "Archetype",
                 value = it,
                 backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
-                textColor = MaterialTheme.colorScheme.onSecondaryContainer
+                textColor = MaterialTheme.colorScheme.onSecondaryContainer,
             )
         }
     }
