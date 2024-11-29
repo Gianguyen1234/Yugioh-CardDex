@@ -46,9 +46,9 @@ fun CardDetailScreen(card: Card, onBackClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Expandable and Swipeable Image Section
         SwipeableExpandableImage(
-            imageUrls = card.card_images.map { it.image_url },
+            imageUrls = card.card_images.map { it.image_url },              // Full images for expanded state
+            croppedImageUrls = card.card_images.map { it.image_url_cropped ?: it.image_url }, // Cropped images for preview
             currentImageIndex = currentImageIndex,
             onImageChange = { currentImageIndex = it },
             isExpanded = isExpanded,
@@ -62,6 +62,7 @@ fun CardDetailScreen(card: Card, onBackClick: () -> Unit) {
         CardDetailsSection(card = card)
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,15 +93,16 @@ fun CardDetailTopBar(title: String, onBackClick: () -> Unit) {
 
 @Composable
 fun SwipeableExpandableImage(
-    imageUrls: List<String>,
+    imageUrls: List<String>,            // Full image URLs
+    croppedImageUrls: List<String>,     // Cropped image URLs for preview
     currentImageIndex: Int,
     onImageChange: (Int) -> Unit,
     isExpanded: Boolean,
     onExpandToggle: () -> Unit,
     scrollState: androidx.compose.foundation.ScrollState
 ) {
-    val maxIndex = imageUrls.size - 1
-    val scale = 1f - (scrollState.value / 1000f).coerceIn(0f, 0.3f) // Add a subtle scale effect
+    val maxIndex = croppedImageUrls.size - 1
+    val scale = 1f - (scrollState.value / 1000f).coerceIn(0f, 0.3f) // Subtle scale effect
 
     Box(
         modifier = Modifier
@@ -121,11 +123,14 @@ fun SwipeableExpandableImage(
             .clip(RoundedCornerShape(16.dp))
             .shadow(12.dp, RoundedCornerShape(16.dp))
     ) {
+        // Choose between cropped or full image URLs based on expanded state
+        val imageUrl = if (isExpanded) imageUrls[currentImageIndex] else croppedImageUrls[currentImageIndex]
+
         // Display Current Image
         Image(
-            painter = rememberAsyncImagePainter(model = imageUrls[currentImageIndex]),
+            painter = rememberAsyncImagePainter(model = imageUrl),
             contentDescription = null,
-            contentScale = ContentScale.Crop,
+            contentScale = if (isExpanded) ContentScale.Fit else ContentScale.Crop,
             modifier = Modifier
                 .fillMaxSize()
                 .clickable { onExpandToggle() } // Toggle fullscreen dialog
@@ -160,6 +165,7 @@ fun SwipeableExpandableImage(
         }
     }
 }
+
 
 @Composable
 fun CardDetailsSection(card: Card) {
