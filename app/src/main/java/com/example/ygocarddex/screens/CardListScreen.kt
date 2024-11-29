@@ -19,22 +19,18 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.ygocarddex.components.YugiohCard
 import com.example.ygocarddex.data.models.Card
-import com.example.ygocarddex.data.models.CardImage
-import com.example.ygocarddex.data.models.CardPrice
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -161,42 +157,42 @@ fun SearchBar(
 
 
 // Sample data for preview
-val sampleCardList = listOf(
-    Card(
-        id = 1,
-        name = "Blue-Eyes White Dragon",
-        type = "Normal Monster",
-        desc = "A legendary dragon that is a powerful engine of destruction.",
-        race = "Dragon",
-        archetype = "Blue-Eyes",
-        card_images = listOf(CardImage(image_url = "https://ygoprodeck.com/card/a-cell-breeding-device-9766")),
-        card_prices = listOf(
-            CardPrice(
-                cardmarket_price = "20.00",
-                tcgplayer_price = "18.50",
-                ebay_price = "22.00",
-                amazon_price = "23.00",
-                coolstuffinc_price = "21.00"
-            )
-        )
-    ),
-    Card(
-        id = 2,
-        name = "Dark Magician",
-        type = "Spellcaster",
-        desc = "The ultimate wizard in terms of attack and defense.",
-        race = "Spellcaster",
-        archetype = "Dark Magician",
-        card_images = listOf(CardImage(image_url = "https://ygoprodeck.com/card/a-cell-breeding-device-9766")),
-        card_prices = listOf(
-            CardPrice(
-                cardmarket_price = "15.00",
-                tcgplayer_price = "14.00",
-                ebay_price = "16.50",
-                amazon_price = "17.00",
-                coolstuffinc_price = "16.00"
-            )
-        )
-    )
-)
+//val sampleCardList = listOf(
+//    Card(
+//        id = 1,
+//        name = "Blue-Eyes White Dragon",
+//        type = "Normal Monster",
+//        desc = "A legendary dragon that is a powerful engine of destruction.",
+//        race = "Dragon",
+//        archetype = "Blue-Eyes",
+//        card_images = listOf(CardImage(image_url = "https://ygoprodeck.com/card/a-cell-breeding-device-9766")),
+//        card_prices = listOf(
+//            CardPrice(
+//                cardmarket_price = "20.00",
+//                tcgplayer_price = "18.50",
+//                ebay_price = "22.00",
+//                amazon_price = "23.00",
+//                coolstuffinc_price = "21.00"
+//            )
+//        )
+//    ),
+//    Card(
+//        id = 2,
+//        name = "Dark Magician",
+//        type = "Spellcaster",
+//        desc = "The ultimate wizard in terms of attack and defense.",
+//        race = "Spellcaster",
+//        archetype = "Dark Magician",
+//        card_images = listOf(CardImage(image_url = "https://ygoprodeck.com/card/a-cell-breeding-device-9766")),
+//        card_prices = listOf(
+//            CardPrice(
+//                cardmarket_price = "15.00",
+//                tcgplayer_price = "14.00",
+//                ebay_price = "16.50",
+//                amazon_price = "17.00",
+//                coolstuffinc_price = "16.00"
+//            )
+//        )
+//    )
+//)
 

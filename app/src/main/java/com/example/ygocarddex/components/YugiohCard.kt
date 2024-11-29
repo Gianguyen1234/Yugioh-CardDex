@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -34,15 +35,23 @@ fun YugiohCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Card Image
-            Image(
-                painter = rememberAsyncImagePainter(model = card.card_images.first().image_url),
-                contentDescription = card.name,
+            // Card Image with Vignette Effect
+            val imageUrl = card.card_images.firstOrNull()?.image_url_cropped ?: card.card_images.firstOrNull()?.image_url
+
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp),
-                contentScale = ContentScale.Crop
-            )
+                    .height(250.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(model = imageUrl),
+                    contentDescription = card.name,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -55,18 +64,41 @@ fun YugiohCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Distinct Section for Type, Race, and Archetype
-            TypeRaceArchetypeSection(card = card)
+            // New Box with TypeRaceArchetypeSection on the left and AtkDefAttributeSection on the right
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    // Type, Race, Archetype Section
+                    Column(modifier = Modifier.weight(1f)) {
+                        TypeRaceArchetypeSection(card = card)
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    // ATK, DEF, Attribute Section
+                    Column(modifier = Modifier.weight(1f)) {
+                        AtkDefAttributeSection(card = card)
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Card Description
-            Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = card.desc,
+                text = truncateDescription(card.desc, 20),
                 style = MaterialTheme.typography.bodyMedium
             )
         }
     }
 }
+
 
 @Composable
 fun TypeRaceArchetypeSection(card: Card) {
@@ -114,6 +146,63 @@ fun TypeRaceArchetypeSection(card: Card) {
 }
 
 @Composable
+fun AtkDefAttributeSection(card: Card) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        // Display ATK with a bold red background
+        card.atk?.let {
+            BadgeRow(
+                label = "ATK",
+                value = it.toString(),
+                backgroundColor = Color(0xFFE57373), // Light red for ATK
+                textColor = Color(0xFFB71C1C) // Dark red for text
+            )
+        }
+
+        // Display DEF with a bold blue background
+        card.def?.let {
+            BadgeRow(
+                label = "DEF",
+                value = it.toString(),
+                backgroundColor = Color(0xFF64B5F6), // Light blue for DEF
+                textColor = Color(0xFF0D47A1) // Dark blue for text
+            )
+        }
+
+        // Display Attribute with a color depending on the attribute type
+        card.attribute?.let { attribute ->
+            val (backgroundColor, textColor) = getAttributeColors(attribute)
+            BadgeRow(
+                label = "Attribute",
+                value = attribute,
+                backgroundColor = backgroundColor,
+                textColor = textColor
+            )
+        }
+    }
+}
+
+/**
+ * Returns a pair of background and text colors for each attribute type.
+ */
+fun getAttributeColors(attribute: String): Pair<Color, Color> {
+    return when (attribute) {
+        "DARK" -> Pair(Color(0xFF424242), Color(0xFFFFFFFF)) // Dark gray background, white text
+        "LIGHT" -> Pair(Color(0xFFFFF9C4), Color(0xFFFFC107)) // Light yellow background, golden text
+        "FIRE" -> Pair(Color(0xFFFF7043), Color(0xFFD84315)) // Orange background, dark orange text
+        "WATER" -> Pair(Color(0xFF64B5F6), Color(0xFF1565C0)) // Light blue background, navy text
+        "EARTH" -> Pair(Color(0xFF8D6E63), Color(0xFF3E2723)) // Brown background, dark brown text
+        "WIND" -> Pair(Color(0xFF81C784), Color(0xFF2E7D32)) // Light green background, forest green text
+        "DIVINE" -> Pair(Color(0xFFE6EE9C), Color(0xFFAFB42B)) // Pale gold background, olive green text
+        else -> Pair(Color(0xFFE0E0E0), Color(0xFF616161)) // Default: Light gray background, dark gray text
+    }
+}
+
+
+@Composable
 fun BadgeRow(label: String, value: String, backgroundColor: Color, textColor: Color) {
     Row(
         modifier = Modifier
@@ -142,5 +231,14 @@ fun BadgeRow(label: String, value: String, backgroundColor: Color, textColor: Co
     }
 }
 
-
-
+/**
+ * Truncate a string to a specified number of words, adding "..." if truncated.
+ */
+fun truncateDescription(description: String, maxWords: Int): String {
+    val words = description.split(" ")
+    return if (words.size > maxWords) {
+        words.take(maxWords).joinToString(" ") + "..."
+    } else {
+        description
+    }
+}
